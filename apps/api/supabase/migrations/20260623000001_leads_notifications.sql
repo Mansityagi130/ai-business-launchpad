@@ -17,10 +17,10 @@ create index idx_leads_status on public.leads(status);
 -- 2. NOTIFICATIONS TABLE
 create table public.notifications (
     id uuid default uuid_generate_v4() primary key,
-    user_id uuid references public.users(id) on delete cascade not null,
+    user_id uuid references public.users(id) on delete cascade, -- Nullable for system-wide alerts
     title varchar(255) not null,
     message text not null,
-    type varchar(50) not null check (type in ('LeadCaptured', 'WebsitePublished', 'AIGenerationCompleted')),
+    type varchar(50) not null check (type in ('LeadCaptured', 'WebsitePublished', 'AIGenerationCompleted', 'system_alert')),
     is_read boolean default false not null,
     created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
