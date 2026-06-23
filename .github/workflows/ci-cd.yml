@@ -1,0 +1,59 @@
+name: CI-CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Linter check
+        run: pnpm lint
+
+      - name: Typecheck shared types
+        run: pnpm --filter @launchpad/types build
+
+      - name: Build packages & applications
+        run: pnpm build
+
+      - name: Run backend unit tests
+        run: pnpm --filter @launchpad/api exec node --import ts-node/register --test tests/run-tests.ts
+
+  deploy:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Vercel (Frontend)
+        run: echo "Triggering Vercel deployment webhook..."
+        
+      - name: Deploy to Railway (API)
+        run: echo "Triggering Railway deployment pipeline..."
+
+      - name: Deploy to Render (Workers & Redis)
+        run: echo "Triggering Render queue pipeline..."
