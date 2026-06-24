@@ -21,6 +21,7 @@ export const router = Router();
 // ==========================================
 router.get("/health", SystemController.health);
 router.get("/ready", SystemController.ready);
+router.get("/debug/redis", SystemController.debugRedis);
 router.get("/admin/system-status", SystemController.systemStatus);
 
 // ==========================================

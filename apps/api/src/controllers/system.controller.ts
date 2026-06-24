@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { supabase } from "../config/supabase.js";
-import { redisConnection } from "../config/redis.js";
+import { redisConnection, lastRedisError } from "../config/redis.js";
 import { aiGenerationQueue, aiEditQueue } from "../config/bullmq.js";
 import { BillingService, PLAN_LIMITS } from "../services/billing.service.js";
 import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
@@ -27,26 +27,44 @@ export class SystemController {
     };
     let isReady = true;
 
+    console.log("[Readiness Probe] Starting readiness checks...");
+
     // Check Postgres (Supabase)
     try {
+      console.log("[Readiness Probe] Testing Supabase database connection...");
       const dbStart = Date.now();
       const { error } = await supabase.from("feature_flags").select("key").limit(1);
       if (error) throw error;
+      console.log(`[Readiness Probe] Supabase responded in ${Date.now() - dbStart}ms`);
       checks.database = { status: "ready", latencyMs: Date.now() - dbStart };
     } catch (err: any) {
+      console.error("[Readiness Probe] Supabase check failed:", err.message || err);
       isReady = false;
       checks.database = { status: "failed", error: err.message || err };
     }
 
     // Check Redis
     try {
+      console.log("[Readiness Probe] Testing Redis connection (ping) with 5s timeout...");
       const redisStart = Date.now();
-      await redisConnection.ping();
+      
+      // Wrap Redis ping in a 5-second timeout to prevent indefinite hanging
+      await Promise.race([
+        redisConnection.ping(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Redis ping timeout after 5000ms")), 5000)
+        )
+      ]);
+
+      console.log(`[Readiness Probe] Redis responded in ${Date.now() - redisStart}ms`);
       checks.redis = { status: "ready", latencyMs: Date.now() - redisStart };
     } catch (err: any) {
+      console.error("[Readiness Probe] Redis check failed:", err.message || err);
       isReady = false;
       checks.redis = { status: "failed", error: err.message || err };
     }
+
+    console.log(`[Readiness Probe] Readiness check complete. Status ready: ${isReady}`);
 
     const statusCode = isReady ? 200 : 503;
     return res.status(statusCode).json({
@@ -155,5 +173,44 @@ export class SystemController {
         error: { code: "SERVER_ERROR", message: err.message || err }
       });
     }
+  }
+
+  /**
+   * Temporary debug endpoint to verify Redis connection status and options
+   */
+  static async debugRedis(req: Request, res: Response) {
+    const start = Date.now();
+    let pingLatency: number | string = "unknown";
+    let pingError: string | null = null;
+
+    try {
+      await Promise.race([
+        redisConnection.ping(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Redis ping timeout after 3000ms")), 3000)
+        )
+      ]);
+      pingLatency = Date.now() - start;
+    } catch (err: any) {
+      pingError = err.message || err;
+    }
+
+    const redisUrl = process.env.REDIS_URL || "redis://127.0.0.1:6379";
+    let redisHost = "unknown";
+    try {
+      const urlObj = new URL(redisUrl);
+      redisHost = urlObj.host;
+    } catch (e) {
+      redisHost = redisUrl;
+    }
+
+    return res.json({
+      status: redisConnection.status, // "close", "connecting", "ready", etc.
+      pingLatencyMs: pingLatency,
+      pingError,
+      redisHost,
+      lastConnectionError: lastRedisError,
+      timestamp: new Date().toISOString()
+    });
   }
 }
