@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Button } from "@launchpad/ui";
 
 function LeadsCRMContent() {
@@ -75,74 +76,84 @@ function LeadsCRMContent() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "new": return "bg-blue-900/30 text-blue-200 border-blue-800";
-      case "contacted": return "bg-amber-900/30 text-amber-250 border-amber-800";
-      case "qualified": return "bg-purple-900/30 text-purple-200 border-purple-800";
-      case "won": return "bg-green-900/30 text-green-200 border-green-800";
-      default: return "bg-slate-800 text-slate-400 border-slate-700";
+      case "new": return "bg-blue-50 text-blue-700 border-blue-200";
+      case "contacted": return "bg-brand-surface text-brand-text border-brand-primary/10";
+      case "qualified": return "bg-purple-50 text-purple-700 border-purple-200";
+      case "won": return "bg-brand-primary/10 text-brand-primary border-brand-primary/20";
+      default: return "bg-brand-bg text-brand-text/50 border-brand-primary/10";
     }
+  };
+
+  const pageTransition = {
+    initial: { opacity: 0, y: 10 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.3 } }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">
+      <div className="min-h-screen bg-brand-bg flex items-center justify-center text-brand-primary font-medium">
         Loading CRM records...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-10 max-w-7xl mx-auto space-y-8">
+    <motion.div
+      initial="initial"
+      animate="animate"
+      variants={pageTransition}
+      className="min-h-screen bg-brand-bg text-brand-text p-6 md:p-10 max-w-7xl mx-auto space-y-8 select-none"
+    >
       <header className="flex justify-between items-center">
         <div>
-          <button onClick={() => router.push("/dashboard")} className="text-sm text-slate-400 hover:text-white">
-            ← Dashboard
+          <button onClick={() => router.push("/dashboard")} className="text-xs font-bold text-brand-primary hover:text-brand-dark uppercase tracking-wider">
+            ← Return to Dashboard
           </button>
-          <h1 className="text-3xl font-bold tracking-tight mt-2">Leads CRM</h1>
-          <p className="text-slate-450 text-sm mt-1">Track and manage service requests from your site</p>
+          <h1 className="font-serif text-3xl font-extrabold text-brand-dark mt-3">Leads CRM</h1>
+          <p className="text-brand-text/50 text-xs mt-1">Track and manage customer submissions captured from your contact form</p>
         </div>
       </header>
 
       {error && (
-        <div className="bg-amber-950/20 border border-amber-800 text-amber-200 p-3 rounded-md text-sm">
+        <div className="bg-brand-accent/15 border border-brand-accent/30 text-brand-dark p-3 rounded-lg text-xs font-semibold">
           {error}
         </div>
       )}
 
       {leads.length === 0 ? (
-        <div className="border border-dashed border-slate-850 rounded-xl p-16 text-center text-slate-500">
-          No leads captured yet. Contact forms on your published site will record submissions here.
+        <div className="border-2 border-dashed border-brand-primary/10 bg-brand-surface/10 rounded-2xl p-16 text-center text-brand-text/50 font-medium">
+          No leads captured yet. Submissions from contact forms on your active site will register here.
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-slate-850 bg-slate-900/20">
+        <div className="overflow-x-auto rounded-2xl border border-brand-primary/10 bg-brand-bg shadow-sm">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-850 text-xs font-semibold text-slate-400 uppercase bg-slate-900/40">
-                <th className="p-4">Contact</th>
-                <th className="p-4">Message</th>
-                <th className="p-4">Date</th>
-                <th className="p-4">Status</th>
+              <tr className="border-b border-brand-primary/10 text-xs font-bold text-brand-text/50 uppercase bg-brand-surface/20">
+                <th className="p-4">Contact Profile</th>
+                <th className="p-4">Message Summary</th>
+                <th className="p-4">Inquiry Date</th>
+                <th className="p-4">CRM Status Badge</th>
               </tr>
             </thead>
             <tbody>
               {leads.map((lead) => (
-                <tr key={lead.id} className="border-b border-slate-850/80 hover:bg-slate-900/10 transition-colors">
+                <tr key={lead.id} className="border-b border-brand-primary/5 hover:bg-brand-surface/5 transition-colors">
                   <td className="p-4 space-y-1">
-                    <div className="font-semibold text-white">{lead.name}</div>
-                    <div className="text-xs text-slate-400">{lead.email}</div>
-                    {lead.phone && <div className="text-xs text-slate-500">{lead.phone}</div>}
+                    <div className="font-bold text-brand-dark text-sm">{lead.name}</div>
+                    <div className="text-xs text-brand-text/60">{lead.email}</div>
+                    {lead.phone && <div className="text-[10px] text-brand-text/40 font-mono">{lead.phone}</div>}
                   </td>
-                  <td className="p-4 text-sm text-slate-300 max-w-sm truncate">
-                    {lead.message || <span className="italic text-slate-500">No message provided</span>}
+                  <td className="p-4 text-xs text-brand-text/75 max-w-sm truncate">
+                    {lead.message || <span className="italic text-brand-text/30">No message content provided</span>}
                   </td>
-                  <td className="p-4 text-xs text-slate-500">
+                  <td className="p-4 text-xs text-brand-text/40 font-medium">
                     {new Date(lead.created_at).toLocaleDateString()}
                   </td>
                   <td className="p-4">
                     <select
                       value={lead.status}
                       onChange={(e) => handleStatusChange(lead.id, e.target.value)}
-                      className={`text-xs font-semibold px-2.5 py-1 rounded border focus:outline-none ${getStatusColor(
+                      className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border-2 focus:outline-none transition-colors cursor-pointer ${getStatusColor(
                         lead.status
                       )}`}
                     >
@@ -159,13 +170,13 @@ function LeadsCRMContent() {
           </table>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
 export default function LeadsCRMPage() {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-slate-950 text-slate-100 p-10">Loading Leads...</div>}>
+    <React.Suspense fallback={<div className="min-h-screen bg-brand-bg text-brand-primary p-10 font-semibold text-center">Loading Leads...</div>}>
       <LeadsCRMContent />
     </React.Suspense>
   );

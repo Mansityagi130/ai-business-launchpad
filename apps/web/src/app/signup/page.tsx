@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { Button } from "@launchpad/ui";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -60,75 +62,120 @@ export default function SignupPage() {
     }
   };
 
+  const pageTransition = {
+    initial: { opacity: 0, scale: 0.98 },
+    animate: { opacity: 1, scale: 1, transition: { duration: 0.4 } }
+  };
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12">
-      <div className="w-full max-w-md space-y-8 rounded-2xl border border-slate-800 bg-slate-900/50 p-8 backdrop-blur-md shadow-2xl">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-white">Create Account</h2>
-          <p className="mt-2 text-sm text-slate-400">Join AI Business Launchpad to build your site</p>
+    <motion.main
+      initial="initial"
+      animate="animate"
+      variants={pageTransition}
+      className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-brand-bg text-brand-text select-none"
+    >
+      {/* Left Pane - Brand Story Panel */}
+      <section className="bg-brand-dark text-brand-bg p-8 md:p-16 flex flex-col justify-between relative overflow-hidden hidden md:flex">
+        <div className="absolute top-0 right-0 pointer-events-none opacity-10">
+          <div className="w-[500px] h-[500px] rounded-full bg-brand-accent blur-3xl translate-x-1/3 -translate-y-1/3"></div>
         </div>
+        <div 
+          className="font-serif text-2xl font-bold tracking-tight text-white flex items-center gap-1.5 cursor-pointer"
+          onClick={() => router.push("/")}
+        >
+          <span className="h-3.5 w-3.5 rounded-full bg-brand-accent inline-block"></span>
+          SiteMint
+        </div>
+        <div className="space-y-6 relative z-10 max-w-lg">
+          <h1 className="font-serif text-4xl lg:text-5xl font-extrabold leading-[1.15]">
+            Bootstrap your landing page in seconds.
+          </h1>
+          <p className="text-sm text-brand-bg/75 leading-relaxed">
+            SiteMint automates copywriting, layout structuring, and hosting configurations. Register your account and begin minting sites today.
+          </p>
+        </div>
+        <div className="text-xs text-brand-bg/40 font-mono">
+          SiteMint Cloud Console • Version 1.0.0
+        </div>
+      </section>
 
-        {error && (
-          <div className="rounded-md bg-red-950/50 border border-red-800 p-4 text-sm text-red-200">
-            {error}
-          </div>
-        )}
-
-        <form className="mt-8 space-y-6" onSubmit={handleSignup}>
-          <div className="space-y-4 rounded-md">
-            <div>
-              <label className="block text-sm font-medium text-slate-350 mb-1">Full Name</label>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-md border border-slate-700 bg-slate-800/80 px-3 py-2 text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm"
-                placeholder="John Doe"
-              />
+      {/* Right Pane - Credentials Signup Panel */}
+      <section className="flex items-center justify-center p-8 md:p-16 bg-brand-bg">
+        <div className="w-full max-w-md space-y-8">
+          <div className="space-y-2">
+            {/* Mobile Logo Fallback */}
+            <div className="md:hidden font-serif text-xl font-bold text-brand-dark flex items-center gap-1 mb-4">
+              <span className="h-2.5 w-2.5 rounded-full bg-brand-accent inline-block"></span>
+              SiteMint
             </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-350 mb-1">Email address</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border border-slate-700 bg-slate-800/80 px-3 py-2 text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm"
-                placeholder="you@example.com"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-350 mb-1">Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-md border border-slate-700 bg-slate-800/80 px-3 py-2 text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm"
-                placeholder="••••••••"
-              />
-            </div>
+            <h2 className="font-serif text-3xl font-extrabold tracking-tight text-brand-dark">Create Account</h2>
+            <p className="text-sm text-brand-text/65 font-medium">Join SiteMint to build your site</p>
           </div>
 
-          <div>
+          {error && (
+            <div className={`rounded-lg p-4 text-xs font-semibold ${
+              error.includes("Confirmation email") 
+                ? "bg-brand-primary/10 border border-brand-primary/20 text-brand-primary" 
+                : "bg-red-500/10 border border-red-500/20 text-red-700"
+            }`}>
+              {error}
+            </div>
+          )}
+
+          <form className="space-y-5" onSubmit={handleSignup}>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-brand-dark uppercase tracking-wider mb-1">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-lg border-2 border-brand-primary/10 bg-brand-bg px-4 py-2.5 text-brand-text placeholder-brand-text/30 focus:border-brand-primary focus:outline-none text-sm transition-colors"
+                  placeholder="John Doe"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-brand-dark uppercase tracking-wider mb-1">Email address</label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-lg border-2 border-brand-primary/10 bg-brand-bg px-4 py-2.5 text-brand-text placeholder-brand-text/30 focus:border-brand-primary focus:outline-none text-sm transition-colors"
+                  placeholder="you@example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-brand-dark uppercase tracking-wider mb-1">Password</label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-lg border-2 border-brand-primary/10 bg-brand-bg px-4 py-2.5 text-brand-text placeholder-brand-text/30 focus:border-brand-primary focus:outline-none text-sm transition-colors"
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
-              className="group relative flex w-full justify-center rounded-md bg-amber-500 px-3 py-2 text-sm font-semibold text-slate-905 hover:bg-amber-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 active:scale-98 transition-all disabled:opacity-50"
+              className="w-full flex justify-center py-3 px-4 rounded-lg bg-brand-primary text-brand-bg text-sm font-semibold hover:bg-brand-dark active:scale-[0.99] transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-brand-primary/10 shadow-sm"
             >
               {loading ? "Registering account..." : "Sign Up"}
             </button>
-          </div>
-        </form>
+          </form>
 
-        <p className="text-center text-sm text-slate-400 mt-4">
-          Already have an account?{" "}
-          <button onClick={() => router.push("/login")} className="text-amber-500 hover:underline font-medium">
-            Login
-          </button>
-        </p>
-      </div>
-    </main>
+          <p className="text-center text-xs text-brand-text/50 font-medium">
+            Already have an account?{" "}
+            <button onClick={() => router.push("/login")} className="text-brand-primary hover:text-brand-dark hover:underline font-bold">
+              Login
+            </button>
+          </p>
+        </div>
+      </section>
+    </motion.main>
   );
 }

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 function AnalyticsDashboardContent() {
   const searchParams = useSearchParams();
@@ -62,26 +63,36 @@ function AnalyticsDashboardContent() {
     loadAnalytics();
   }, [websiteId]);
 
+  const pageTransition = {
+    initial: { opacity: 0, y: 10 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.3 } }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">
+      <div className="min-h-screen bg-brand-bg flex items-center justify-center text-brand-primary font-medium">
         Compiling analytics summaries...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-10 max-w-7xl mx-auto space-y-8">
+    <motion.div
+      initial="initial"
+      animate="animate"
+      variants={pageTransition}
+      className="min-h-screen bg-brand-bg text-brand-text p-6 md:p-10 max-w-7xl mx-auto space-y-8 select-none"
+    >
       <header>
-        <button onClick={() => router.push("/dashboard")} className="text-sm text-slate-400 hover:text-white">
-          ← Dashboard
+        <button onClick={() => router.push("/dashboard")} className="text-xs font-bold text-brand-primary hover:text-brand-dark uppercase tracking-wider">
+          ← Return to Dashboard
         </button>
-        <h1 className="text-3xl font-bold tracking-tight mt-2">Analytics</h1>
-        <p className="text-slate-450 text-sm mt-1">Track traffic, visitor metrics, and lead conversions</p>
+        <h1 className="font-serif text-3xl font-extrabold text-brand-dark mt-3">Site Analytics</h1>
+        <p className="text-brand-text/50 text-xs mt-1">Track traffic, visitor metrics, and lead conversions</p>
       </header>
 
       {error && (
-        <div className="bg-amber-950/20 border border-amber-800 text-amber-200 p-3 rounded-md text-sm">
+        <div className="bg-brand-accent/15 border border-brand-accent/30 text-brand-dark p-3 rounded-lg text-xs font-semibold">
           {error}
         </div>
       )}
@@ -90,51 +101,51 @@ function AnalyticsDashboardContent() {
         <>
           {/* Key Metrics Widgets */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="border border-slate-850 bg-slate-900/30 p-6 rounded-xl space-y-2">
-              <span className="text-xs text-slate-500 font-semibold uppercase">Page Views</span>
-              <div className="text-3xl font-bold text-white">{metrics.pageviews}</div>
+            <div className="border border-brand-primary/10 bg-brand-bg p-6 rounded-2xl shadow-sm space-y-2">
+              <span className="text-[10px] text-brand-text/50 font-bold uppercase tracking-wider">Page Views</span>
+              <div className="text-3xl font-serif font-extrabold text-brand-dark">{metrics.pageviews}</div>
             </div>
-            <div className="border border-slate-850 bg-slate-900/30 p-6 rounded-xl space-y-2">
-              <span className="text-xs text-slate-500 font-semibold uppercase">Unique Visitors</span>
-              <div className="text-3xl font-bold text-white">{metrics.uniqueVisitors}</div>
+            <div className="border border-brand-primary/10 bg-brand-bg p-6 rounded-2xl shadow-sm space-y-2">
+              <span className="text-[10px] text-brand-text/50 font-bold uppercase tracking-wider">Unique Visitors</span>
+              <div className="text-3xl font-serif font-extrabold text-brand-dark">{metrics.uniqueVisitors}</div>
             </div>
-            <div className="border border-slate-850 bg-slate-900/30 p-6 rounded-xl space-y-2">
-              <span className="text-xs text-slate-500 font-semibold uppercase">Leads Generated</span>
-              <div className="text-3xl font-bold text-amber-500">{metrics.leadsGenerated}</div>
+            <div className="border border-brand-primary/10 bg-brand-bg p-6 rounded-2xl shadow-sm space-y-2">
+              <span className="text-[10px] text-brand-text/50 font-bold uppercase tracking-wider">Leads Captured</span>
+              <div className="text-3xl font-serif font-extrabold text-brand-primary">{metrics.leadsGenerated}</div>
             </div>
-            <div className="border border-slate-850 bg-slate-900/30 p-6 rounded-xl space-y-2">
-              <span className="text-xs text-slate-500 font-semibold uppercase">Conversion Rate</span>
-              <div className="text-3xl font-bold text-green-500">{metrics.conversionRate}</div>
+            <div className="border border-brand-primary/10 bg-brand-bg p-6 rounded-2xl shadow-sm space-y-2">
+              <span className="text-[10px] text-brand-text/50 font-bold uppercase tracking-wider">Conversion Rate</span>
+              <div className="text-3xl font-serif font-extrabold text-brand-accent">{metrics.conversionRate}</div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4">
             {/* Top Visited Pages List */}
-            <div className="border border-slate-850 bg-slate-900/10 p-6 rounded-xl space-y-4">
-              <h3 className="text-lg font-bold text-slate-200">Top Pages</h3>
+            <div className="border border-brand-primary/10 bg-brand-surface/20 p-6 rounded-2xl space-y-4 shadow-sm">
+              <h3 className="font-serif text-lg font-bold text-brand-dark">Top Pages</h3>
               <div className="space-y-3">
                 {metrics.topPages?.map((page: any, idx: number) => (
-                  <div key={idx} className="flex justify-between items-center py-2 border-b border-slate-850/80 text-sm">
-                    <span className="font-mono text-slate-300">{page.slug}</span>
-                    <span className="font-semibold text-white">{page.count} views</span>
+                  <div key={idx} className="flex justify-between items-center py-3 border-b border-brand-primary/10 text-xs font-semibold">
+                    <span className="font-mono text-brand-text/70">{page.slug}</span>
+                    <span className="text-brand-dark">{page.count} views</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Traffic Sources list */}
-            <div className="border border-slate-850 bg-slate-900/10 p-6 rounded-xl space-y-4">
-              <h3 className="text-lg font-bold text-slate-200">Traffic Referrals</h3>
+            <div className="border border-brand-primary/10 bg-brand-surface/20 p-6 rounded-2xl space-y-4 shadow-sm">
+              <h3 className="font-serif text-lg font-bold text-brand-dark">Traffic Referrals</h3>
               <div className="space-y-4">
                 {metrics.trafficSources?.map((src: any, idx: number) => (
-                  <div key={idx} className="space-y-1">
-                    <div className="flex justify-between text-xs text-slate-400">
+                  <div key={idx} className="space-y-2">
+                    <div className="flex justify-between text-xs font-bold text-brand-text/70">
                       <span>{src.source}</span>
                       <span>{src.percentage}%</span>
                     </div>
-                    <div className="w-full bg-slate-850 h-2 rounded-full overflow-hidden">
+                    <div className="w-full bg-brand-primary/10 h-2 rounded-full overflow-hidden">
                       <div
-                        className="bg-amber-500 h-full rounded-full"
+                        className="bg-brand-primary h-full rounded-full"
                         style={{ width: `${src.percentage}%` }}
                       ></div>
                     </div>
@@ -145,13 +156,13 @@ function AnalyticsDashboardContent() {
           </div>
         </>
       )}
-    </div>
+    </motion.div>
   );
 }
 
 export default function AnalyticsDashboardPage() {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-slate-950 text-slate-100 p-10">Loading Analytics...</div>}>
+    <React.Suspense fallback={<div className="min-h-screen bg-brand-bg text-brand-primary p-10 font-semibold text-center">Loading Analytics...</div>}>
       <AnalyticsDashboardContent />
     </React.Suspense>
   );

@@ -1,9 +1,22 @@
 import React from "react";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./global.css";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+});
+
 export const metadata = {
-  title: "AI Business Launchpad",
-  description: "Generate and edit your professional website using AI.",
+  title: "SiteMint — From idea to website in minutes.",
+  description: "Generate, edit, and publish your professional website in minutes using conversational AI.",
 };
 
 export default function RootLayout({
@@ -12,8 +25,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="bg-slate-950 text-slate-100 min-h-screen">
+    <html lang="en" className={`${inter.variable} ${playfair.variable} scroll-smooth`}>
+      <body className="font-sans bg-brand-bg text-brand-text min-h-screen antialiased">
         {children}
       </body>
     </html>
