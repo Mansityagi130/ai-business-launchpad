@@ -21,7 +21,7 @@ export function middleware(request: NextRequest) {
   const hostname = request.headers.get("host") || "";
   
   // Define hostnames that should be ignored for subdomain routing
-  const mainDomains = ["localhost:3000", "launchpad.ai", "project-name.vercel.app", "ai-business-launchpad.vercel.app"];
+  const mainDomains = ["localhost:3000", "launchpad.ai", "project-name.vercel.app", "ai-business-launchpad.vercel.app", "ai-business-launchpad-web.vercel.app"];
   
   // Find if current hostname is a subdomain
   let subdomain = "";
