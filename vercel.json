@@ -4,12 +4,6 @@
   "outputDirectory": "apps/web/.next",
   "framework": "nextjs",
   "cleanUrls": true,
-  "rewrites": [
-    {
-      "source": "/_next/:path*",
-      "destination": "/:path*"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
