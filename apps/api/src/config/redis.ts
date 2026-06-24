@@ -10,13 +10,13 @@ export let lastRedisError: any = null;
 
 const redisOptions: any = {
   maxRetriesPerRequest: null, // Required by BullMQ
+  enableReadyCheck: true,
+  lazyConnect: false,
 };
 
-// Add explicit TLS configuration if using a secure rediss:// connection (like Upstash)
+// Add empty TLS configuration block if using a secure rediss:// connection (like Upstash)
 if (redisUrl.startsWith("rediss://")) {
-  redisOptions.tls = {
-    rejectUnauthorized: false,
-  };
+  redisOptions.tls = {};
 }
 
 export const redisConnection = new Redis(redisUrl, redisOptions);
